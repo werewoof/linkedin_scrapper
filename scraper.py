@@ -29,46 +29,52 @@ class Scrapper:
 
     def run(self, URL: str):
         self.driver = webdriver.Chrome( options=self.options)
+        # try:
+        #     self.driver.get("https://www.linkedin.com/login")
+        #     self.driver.find_element(
+        #             By.XPATH, "//input[@id='username']"
+        #         ).send_keys(self.email)
+        #     self.driver.find_element(
+        #         By.XPATH, "//input[@id='password']"
+        #     ).send_keys(self.password)
+        #     self.driver.find_element(By.XPATH, "//button[@type='submit']").click()
         try:
-            self.driver.get("https://www.linkedin.com/login")
-            self.driver.find_element(
-                    By.XPATH, "//input[@id='username']"
-                ).send_keys(self.email)
-            self.driver.find_element(
-                By.XPATH, "//input[@id='password']"
-            ).send_keys(self.password)
-            self.driver.find_element(By.XPATH, "//button[@type='submit']").click()
             try:
-    #            self.driver.get("https://www.linkedin.com")
-    #            self.driver.add_cookie({"name": "li_at", "value": self.token})
+                self.driver.get("https://www.linkedin.com")
+                self.driver.add_cookie({"name": "li_at", "value": "AQEDAUmmyosAVL_YAAABjjWeDfcAAAGOWaqR91YAvcMaswSZ8GiyfJgUNR11GEFoA7wWDHSMOIM7OFIYvht0tGMxrjtT5hzNkS8qto6oFQqx4FCMgInlrhWeZlmUNniZfIpykLVihZgnZF_BB7cqqtw7"})
                 self.driver.get(URL)
             except Exception as e:
                 print("ERROR UNABLE TO GET INFO")
                 print(e)
-            self.driver.implicitly_wait(5)
-            name = (
-                self.driver.find_element(
-                    By.XPATH, "//div[@class='dCPfpVvGRbxtgoRoBjKZHhpzpsWnyaSqjgQ']/span/a/h1"
-                )
-                .text
-            )
-            byline = self.driver.find_element(
-                By.XPATH, "//div[@class='text-body-medium break-words']"
-            ).text
-            location = (
-                self.driver.find_element(
-                    By.XPATH, "//div[@class='iOFQhnpWXJcOwLVMAcmqeWnUpOWvCXysrcQ mt2']"
-                )
-                .find_elements(By.TAG_NAME, "span")[0]
-                .text
-            )
+            self.driver.implicitly_wait(7)
+            name = "Words"
+            # name = (
+            #     self.driver.find_element(
+            #         By.XPATH, "//div[@class='dCPfpVvGRbxtgoRoBjKZHhpzpsWnyaSqjgQ']/span/a/h1"
+            #     )
+            #     .text
+            # )
+            byline = 'words'
+            # byline = self.driver.find_element(
+            #     By.XPATH, "//div[@class='text-body-medium break-words']"
+            # ).text
+            location = "some street"
+            # location = (
+            #     self.driver.find_element(
+            #         By.XPATH, "//div[@class='iOFQhnpWXJcOwLVMAcmqeWnUpOWvCXysrcQ mt2']"
+            #     )
+            #     .find_elements(By.TAG_NAME, "span")[0]
+            #     .text
+            # )
             self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-            self.driver.implicitly_wait(2)
+            self.driver.implicitly_wait(10)
+            about = "words"
             about = (
                 self.driver.find_element(By.XPATH, "//div[@class='display-flex ph5 pv3']")
                 .find_elements(By.TAG_NAME, "span")[0]
                 .text
             )
+            pfp_link = "words" 
             pfp_link = self.driver.find_element(
                 By.XPATH,
                 "//div[@class='pv-top-card__non-self-photo-wrapper ml0']/button/img",
@@ -117,7 +123,8 @@ class Scrapper:
             experiences = []
             #print("\nExperiences",experience_list,"\nlength", len(experience_list))
             for element in experience_list:
-                url_link = element.find_element(By.TAG_NAME, "img").get_attribute("src")
+                url_link = 'some url' 
+                # element.find_element(By.TAG_NAME, "img").get_attribute("src")
                 company_role = element.find_elements(
                     By.XPATH,
                 ".//div/div/div/div/div/div/div/div/span",

@@ -14,4 +14,4 @@ def get_data(name):
 if __name__ == "__main__":
     #print(main_scrapper.token)
     print("running")
-    app.run("0.0.0.0", 5000)
+    app.run("0.0.0.0", 3000)

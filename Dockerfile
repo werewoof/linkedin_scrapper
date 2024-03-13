@@ -1,32 +1,49 @@
-# Set base image (host OS)
-FROM python:3.12-alpine
+ARG PYTHON_VERSION=3.12.0
+FROM python:${PYTHON_VERSION}-alpine as base
 
-RUN apk update && apk add --no-cache \
-    chromium \
-    chromium-chromedriver \
-    libstdc++
-ENV CHROME_BIN=/usr/bin/chromium-browser \
-    CHROMEDRIVER_PATH=/usr/bin/chromedriver
+# install chromedriver
+RUN apk update && apk add --no-cache chromium \
+        chromium-chromedriver
 
-# By default, listen on port 5000
-EXPOSE 5000/tcp
+# upgrade pip
+RUN pip install --upgrade pip
 
-# Set the working directory in the container
+# Prevents Python from writing pyc files.
+ENV PYTHONDONTWRITEBYTECODE=1
+
+# Keeps Python from buffering stdout and stderr to avoid situations where
+# the application crashes without emitting any logs due to buffering.
+ENV PYTHONUNBUFFERED=1
+
 WORKDIR /app
 
-# Copy the dependencies file to the working directory
-COPY requirements.txt .
+# Create a non-privileged user that the app will run under.
+# See https://docs.docker.com/go/dockerfile-user-best-practices/
+ARG UID=10001
+RUN adduser \
+    --disabled-password \
+    --gecos "" \
+    --home "/home/appuser" \
+    --shell "/sbin/nologin" \
+    --uid "${UID}" \
+    appuser
 
-# Install any dependencies
-RUN pip install -r requirements.txt
+# Download dependencies as a separate step to take advantage of Docker's caching.
+# Leverage a cache mount to /root/.cache/pip to speed up subsequent builds.
+# Leverage a bind mount to requirements.txt to avoid having to copy them into
+# into this layer.
+RUN --mount=type=cache,target=/root/.cache/pip \
+    --mount=type=bind,source=requirements.txt,target=requirements.txt \
+    python -m pip install -r requirements.txt
 
-# Copy the content of the local src directory to the working directory
-COPY app.py .
+# Switch to the non-privileged user to run the application.
+USER appuser
 
-COPY scraper.py .
+# Copy the source code into the container.
+COPY . .
 
-COPY ./chromedriver .
+# Expose the port that the application listens on.
+EXPOSE 8000
 
-# Specify the command to run on container start
-CMD [ "python", "./app.py" ]
-#CMD ['flask', "run"]
+# Run the application.
+CMD gunicorn 'app:app' --bind=0.0.0.0:8000
