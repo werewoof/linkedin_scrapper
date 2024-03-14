@@ -1,17 +1,31 @@
-from scraper import Scrapper
-from flask import Flask
-import json
+from flask import Flask, jsonify
+from linkedin_api import Linkedin
+from dotenv import load_dotenv
+import os
+
+# Load environment variables from .env file
+load_dotenv()
 
 app = Flask(__name__)
 
-main_scrapper = Scrapper("oliver.po2882@gmail.com", "crackheaD49!") #Scrapper("AQEDAUw0o-sBBYkZAAABjf3LUkYAAAGOIdfWRk0AMW4tiLQ-3n8v5Ya9h_ZyVV4wcOUwqkSgkPcXVGgR6SDFvI16QeJrB5fqyJAzjYPvCsdx2ebz6QG8GraswYijGBixORZ1wyKarwuy6wE9smnZ8aeI")
-
 @app.route("/<name>")
 def get_data(name):
-    return json.dumps(main_scrapper.run(f"https://www.linkedin.com/in/{name}/"))
-    
+    # Initialize your scraper
+
+    # Example LinkedIn API usage
+    linkedin_email = os.getenv("LINKEDIN_EMAIL")
+    linkedin_password = os.getenv("LINKEDIN_PASSWORD")
+
+    api = Linkedin(linkedin_email, linkedin_password)
+    profile = api.get_profile(name)
+    contact_info = api.get_profile_contact_info(name)
+    connections = api.get_profile_connections('1234asc12304')
+
+    return jsonify({
+        "profile": profile,
+        "contact_info": contact_info,
+        "connections": connections
+    })
 
 if __name__ == "__main__":
-    #print(main_scrapper.token)
-    print("running")
-    app.run("0.0.0.0", 3000)
+    app.run(host="0.0.0.0", port=8000)
